@@ -4,6 +4,8 @@
 **Platform:** [n8n](https://n8n.io) (self-hosted)  
 **Tech Stack:** OpenAI · LangChain · Apify · Google Sheets · Google Drive · Pinecone · Browserless · Telegram Bot API  
 
+![Uploading image.png…]()
+
 ---
 
 ## 🧭 Overview
