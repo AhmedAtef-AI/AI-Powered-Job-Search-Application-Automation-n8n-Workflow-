@@ -1,0 +1,1006 @@
+{
+  "name": "Indeed_Job_Finding_and_Submission",
+  "nodes": [
+    {
+      "parameters": {
+        "toolDescription": "Tool to search indeed for jobs.",
+        "method": "POST",
+        "url": "",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"position\": \"{{$fromAI('position')}}\",\n  \"country\": \"{{$fromAI('country')}}\",\n  \"location\": \"{{$fromAI('location')}}\",\n  \"maxItems\": {{$fromAI('maxItems')}},\n  \"parseCompanyDetails\": false,\n  \"saveOnlyUniqueItems\": true,\n  \"followApplyRedirects\": false\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        384,
+        288
+      ],
+      "id": "7145bd34-ff8f-4c6f-95e8-b81c9038349c",
+      "name": "Indeed Job Search Tool"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        224
+      ],
+      "id": "141bef3e-e0db-4b22-9b1f-37fc3d20f8ee",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "lHxaDSbaibc9LChU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1cl07J6T0N8SIBSesmlW8p9IqwL_pmZZAr2eYclLQH80",
+          "mode": "list",
+          "cachedResultName": "Indeed_SW_Engineer_Remote_Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cl07J6T0N8SIBSesmlW8p9IqwL_pmZZAr2eYclLQH80/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cl07J6T0N8SIBSesmlW8p9IqwL_pmZZAr2eYclLQH80/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Salary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Salary', ``, 'string') }}",
+            "external Apply Link": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('external_Apply_Link', ``, 'string') }}",
+            "Position": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Position', ``, 'string') }}",
+            "Company": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Company', ``, 'string') }}",
+            "Job Link": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Job_Link', ``, 'string') }}",
+            "Job Description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Job_Description', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Salary",
+              "displayName": "Salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "external Apply Link",
+              "displayName": "external Apply Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Link",
+              "displayName": "Job Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Description",
+              "displayName": "Job Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -16,
+        288
+      ],
+      "id": "12fc6e20-876d-481c-9ab9-d066437a70f5",
+      "name": "Jobs_Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KgxAu0siZnVMo1MO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=\n## Overview\n\nYou are an intelligent **AI automation assistant** that manages automated job search and logging workflows.\n\nYour main purpose is to:\n\n1. Interpret job search instructions from the user.\n2. Use the **Indeed Job Search Tool** to retrieve job listings.\n3. Log structured job results using the **Jobs_Sheet** tool.\n\n---\n\n## 🎯 Your Responsibilities\n\n* When the user asks to “find,” “search,” or “look for” jobs, you must:\n\n  1. Parse the message for:\n\n     * **Position or role** (e.g., *software engineer, frontend developer*)\n     * **Country** (e.g., *Egypt, US, Germany*)\n     * **Location** (e.g., *Remote, Cairo*)\n  2. Construct a JSON object matching the exact schema below.\n  3. Call the **Indeed Job Search Tool** with that JSON object.\n\n* You **must not** send conversational text or “chatInput” objects to any tool.\n\n* You **must only** send valid JSON input that matches the tool’s expected structure.\n\n---\n\n## 🧰 Tools\n\n### 🛠️ Indeed Job Search Tool\n\nUse this tool to search for jobs on Indeed.\n\nWhen you call this tool, you must send JSON input that exactly follows this structure:\n\n```json\n{\n  \"position\": \"software engineer\",\n  \"country\": \"EG\",\n  \"location\": \"Cairo\",\n  \"maxItems\": 5,\n  \"parseCompanyDetails\": false,\n  \"saveOnlyUniqueItems\": true,\n  \"followApplyRedirects\": false\n}\n```\n\"External Link Jobs Apply Tool\" : Use this tool to apply for Jobs which has external apply link tools.\n\n\"Search Jobs Sheet\" : Use this tool to acces the jobs in the database and if the user asked you about already save jobs you search here.\n\n\"C.V DataBase\" : Use this tool to access the C.V of the user or acess the save C.V's by other users.\n\n\"Log CV\" : Use this tool as secondary database to save fast access data you need to log every CV in the C.V vector database to this fast access database and use this as the current {{ $json.now }}.\n\n\"Get CV Logs\": Use this tool as a fast access database for the CV information you have and if the user asks form breif data about CVs.\n\n\"CV Logs Delete\" : USe this Tool to delete Rows from the CV Logs sheet.\n\n**Rules:**\n\n* Always include **all fields**, even if not specified in the user’s query.\n* Use **reasonable defaults** when information is missing:\n\n  * `\"location\": \"Remote\"`\n  * `\"country\": \"US\"`\n  * `\"maxItems\": 5`\n* Ensure all property names and value types match exactly.\n\n---\n\n### 🗂️ Jobs_Sheet\n\nAfter retrieving job data from Indeed, call this tool to log each job in structured format.\n\nExample log entry:\n\n```json\n{\n  \"job_title\": \"\",\n  \"company_name\": \"\",\n  \"location\": \"\",\n  \"job_link\": \"\",\n  \"summary\": \"\"\n}\n```\n\n---\n\n## 🧭 Behavior Summary\n\n1. Parse user messages into structured parameters.\n2. Construct the Indeed Job Search Tool input JSON.\n3. Send it to the tool — not as chat text, but as a **structured object**.\n4. When results are returned, send each job record to the Jobs_Sheet tool.\n\n---\n\n## 💬 Example Interactions\n\n**User:**\n\n> “Search Egypt for software engineering jobs.”\n\n**You (AI Agent):**\nSend the following JSON to the Indeed Job Search Tool:\n\n```json\n{\n  \"position\": \"software engineer\",\n  \"country\": \"EG\",\n  \"location\": \"Egypt\",\n  \"maxItems\": 5,\n  \"parseCompanyDetails\": false,\n  \"saveOnlyUniqueItems\": true,\n  \"followApplyRedirects\": false\n}\n```\n\n**User:**\n\n> “Find remote frontend developer roles in the US.”\n\n**You (AI Agent):**\n\n```json\n{\n  \"position\": \"frontend developer\",\n  \"country\": \"US\",\n  \"location\": \"Remote\",\n  \"maxItems\": 5,\n  \"parseCompanyDetails\": false,\n  \"saveOnlyUniqueItems\": true,\n  \"followApplyRedirects\": false\n}\n```\n\n---\n\n## ✅ Final Notes\n\n* Do **not** output arrays or nested messages like:\n\n  ```json\n  [{\"action\": \"sendMessage\", \"chatInput\": \"...\"}]\n  ```\n\n  — those are invalid.\n* Always send a **single flat JSON object** matching the expected schema.\n* Keep your language **functional and structured**, not conversational.\n\n---\n\nWould you like me to extend this so the agent can **infer defaults dynamically** (e.g., detect country or role from the user’s profile node in n8n)? That can eliminate the need for the user to specify location every time.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        -16
+      ],
+      "id": "e6f0db31-9be5-4b3c-a286-5086c643f2e1",
+      "name": "Job Searching Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.update_id }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        224
+      ],
+      "id": "36a63bdc-fc43-49c9-ba57-831e3806fe64",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        544
+      ],
+      "id": "6eece119-9955-4192-b099-f8ac9beb644b",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "lHxaDSbaibc9LChU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to automate actions on the website for form filling, clicking apply,etc.\nThis tool expects a JavaScript function used along with browserless tool.",
+        "method": "POST",
+        "url": "https://production-sfo.browserless.io/function",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "2THOG2HvjHKnADre066a91c3b788f0d69f0a6252ddaea6128"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/javascript",
+        "body": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Body', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -864,
+        528
+      ],
+      "id": "b8be25a6-9511-4f70-a4a9-29f6d977f11a",
+      "name": "Website Automation Tool1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to get website html content",
+        "method": "POST",
+        "url": "https://production-sfo.browserless.io/content",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "2THOG2HvjHKnADre066a91c3b788f0d69f0a6252ddaea6128"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -688,
+        528
+      ],
+      "id": "d4de0f2b-e12f-4b98-b90b-9249e4e4e8e9",
+      "name": "Website content tool1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to apply to jobs which has an external apply link",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "## Overview\n\nYou are an intelligent automation agent responsible for orchestrating job search and application workflows using Browserless for browser automation.\nYour purpose is to visit external job posting links, analyze their content, and simulate or perform safe form-filling operations based on provided applicant data.\n\n### Core Capabilities\n\nAccess external job links safely and responsibly using the Browserless Tool.\n\nAnalyze job pages: extract structured details such as job title, company, and application requirements.\n\nIdentify form fields (e.g., name, email, resume upload, message) using semantic or DOM-based detection.\n\nAutofill forms with data provided by the workflow context (like applicant name, email, resume URL, or custom message).\n\nSubmit or simulate submission depending on workflow mode.\n\nHandle errors gracefully (e.g., missing form selectors, invalid URLs, CAPTCHA presence).\n\n\n\n### Available Tools\n\n\"Browserless_Tool\"\nUse this to execute browser automation tasks (navigation, form filling, clicking, extraction).\nIt runs JavaScript in a headless Chrome instance.\n\nExpected Input Example:\n\nexport default async function ({ page }) {\n  await page.goto(\"https://example-job.com/apply\", { waitUntil: \"domcontentloaded\" });\n\n  // Fill form fields\n  await page.type(\"#firstName\", \"John\");\n  await page.type(\"#lastName\", \"Doe\");\n  await page.type(\"#email\", \"john@example.com\");\n  await page.type(\"#coverLetter\", \"I'm very interested in this role because...\");\n\n  // Submit form\n  await Promise.all([\n    page.click(\"#submitButton\"),\n    page.waitForNavigation({ waitUntil: \"domcontentloaded\" })\n  ]);\n\n  const title = await page.title();\n  const screenshot = await page.screenshot({ encoding: \"base64\", fullPage: true });\n\n  return {\n    data: {\n      status: \"submitted\",\n      pageTitle: title,\n      screenshot\n    },\n    type: \"application/json\"\n  };\n}\n\n\nNotes:\n\nAlways validate selectors before typing or clicking.\n\nUse await page.waitForSelector() to ensure elements exist before interaction.\n\nReturn structured data including a status and screenshot for logging."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        -1072,
+        320
+      ],
+      "id": "20a7cd66-bc45-422b-845d-ff2bdd04184e",
+      "name": "External Link Jobs Apply Tool"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1cl07J6T0N8SIBSesmlW8p9IqwL_pmZZAr2eYclLQH80",
+          "mode": "list",
+          "cachedResultName": "Indeed_SW_Engineer_Remote_Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cl07J6T0N8SIBSesmlW8p9IqwL_pmZZAr2eYclLQH80/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cl07J6T0N8SIBSesmlW8p9IqwL_pmZZAr2eYclLQH80/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        288
+      ],
+      "id": "e47c87de-9e8b-466d-8728-faa4a642340b",
+      "name": "Search Jobs Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KgxAu0siZnVMo1MO",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Use this Tool to access saved jobs."
+    },
+    {
+      "parameters": {
+        "content": "## CV Parsing & Processing",
+        "height": 496,
+        "width": 1328,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -912,
+        -592
+      ],
+      "typeVersion": 1,
+      "id": "e3f1878c-6922-4219-8da5-66b39882955e",
+      "name": "Sticky Note",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1Z2Y4-5ANR9AkK5QyGtIKHrq5YZSkdRW9",
+          "mode": "list",
+          "cachedResultName": "Resume-Sample-1-Software-Engineer.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1Z2Y4-5ANR9AkK5QyGtIKHrq5YZSkdRW9/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -384,
+        -464
+      ],
+      "id": "e0f968e4-09ff-4d00-9fa3-636de039e5d7",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "lspj5tIhYANzeAs7",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -464
+      ],
+      "id": "35efdf2d-1aa0-48b5-9705-8827002cc437",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "formTitle": "Uploadd You C.V",
+        "formDescription": "Please Upload Your C.V",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "C.V / Resume",
+              "fieldType": "file",
+              "multipleFiles": false
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -624,
+        -464
+      ],
+      "id": "6bd4df51-2f18-4200-9126-c779f4e4ace0",
+      "name": "On form submission",
+      "webhookId": "c5fcb8fb-f052-4e20-bd92-ca14e014faf4"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -16
+      ],
+      "id": "5a8e830f-0665-4e8a-8468-26f590b67010",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "demo",
+          "mode": "list",
+          "cachedResultName": "demo"
+        },
+        "embeddingBatchSize": 512,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        -464
+      ],
+      "id": "2a1fcabe-d2e2-46d8-814a-9c600d46e427",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "S2foITSrxs6qeCWx",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -288
+      ],
+      "id": "152db8aa-6706-41b8-90da-88f67562fd2f",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "9AjYLtnVMu1q1dJb",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -288
+      ],
+      "id": "9ed502e3-f01f-40ff-8321-3c498e7de238",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        512
+      ],
+      "id": "2b5ed549-df4d-486a-b1be-6a3ef5e25bab",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "9AjYLtnVMu1q1dJb",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use This tool to retrieve C.V data from the database ",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "demo",
+          "mode": "list",
+          "cachedResultName": "demo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        288
+      ],
+      "id": "35fa7d77-88c5-4a17-ac5a-74311a749d57",
+      "name": "C.V DataBase",
+      "credentials": {
+        "pineconeApi": {
+          "id": "S2foITSrxs6qeCWx",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo",
+          "mode": "list",
+          "cachedResultName": "CV Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -16,
+        464
+      ],
+      "id": "f0d86a56-73ea-49c6-8256-852c99b5397e",
+      "name": "Get CV Logs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KgxAu0siZnVMo1MO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo",
+          "mode": "list",
+          "cachedResultName": "CV Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Candidate Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Candidate_Name', ``, 'string') }}",
+            "Job Title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Job_Title', ``, 'string') }}",
+            "CV Upload Date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('CV_Upload_Date', ``, 'string') }}",
+            "Breif": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Breif', ``, 'string') }}",
+            "Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Candidate Name"
+          ],
+          "schema": [
+            {
+              "id": "Candidate Name",
+              "displayName": "Candidate Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV Upload Date",
+              "displayName": "CV Upload Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Breif",
+              "displayName": "Breif",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        112,
+        464
+      ],
+      "id": "ddf9aeb6-2e01-4e55-81a9-45e8b28a3e34",
+      "name": "Log CV",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KgxAu0siZnVMo1MO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo",
+          "mode": "list",
+          "cachedResultName": "CV Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16tejDVXKlnfbAYFGYcsv_EEUlzHrco-A0kOhOqGKkGo/edit#gid=0"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        464
+      ],
+      "id": "633f067d-ad3f-4386-a249-7f7db24bf35d",
+      "name": "CV Logs Delete",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KgxAu0siZnVMo1MO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1056,
+        -16
+      ],
+      "id": "8edae603-7432-429b-b55e-0bcb3ed0aacb",
+      "name": "Telegram Trigger",
+      "webhookId": "f6448246-d06a-48ef-8db8-5e195a8bd558",
+      "credentials": {
+        "telegramApi": {
+          "id": "kO0X3eXKH45sIAQ8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1034477473",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        -16
+      ],
+      "id": "12d27473-35b5-4236-a12f-eddacecb2a7a",
+      "name": "Send a text message",
+      "webhookId": "20c3d302-8445-4a86-a89c-b0542ab55f57",
+      "credentials": {
+        "telegramApi": {
+          "id": "kO0X3eXKH45sIAQ8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        272
+      ],
+      "id": "92a230db-5d7e-4835-bf44-347320acaf5c",
+      "name": "Think"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Indeed Job Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jobs_Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "External Link Jobs Apply Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website content tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "External Link Jobs Apply Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website Automation Tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "External Link Jobs Apply Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "External Link Jobs Apply Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Jobs Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Searching Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "C.V DataBase",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "C.V DataBase": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get CV Logs": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log CV": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CV Logs Delete": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Job Searching Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3f51d07f-a09b-4fb9-ba9b-7ccdead698ff",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8a645824f395768d0357f900b21bdf8d4cb4693eef0bf62634763eccfdb36b76"
+  },
+  "id": "VdmpwOUBfn8hf1Bw",
+  "tags": []
+}
